@@ -1,4 +1,3 @@
-// EmployeeObrazac.java
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
@@ -9,18 +8,17 @@ import java.util.Date;
 import java.util.List;
 
 public class EmployeeObrazac {
-    private JButton logoutButton;
+    private Employee employee;
+    private EmployeeService employeeService;
+    private JLabel nameLabel;
     private JButton addRequestButton;
     private JButton editButton;
     private JButton deleteButton;
-    private JButton refreshButton; // New refresh button
-    private JTable requestTable;
-    private JLabel nameLabel;
-    private JPanel employeePanel;
-
+    private JButton refreshButton;
+    private JButton logoutButton;
     private DefaultTableModel tableModel;
-    private Employee employee;
-    private EmployeeService employeeService;
+    private JTable requestTable;
+    private JPanel employeePanel;
 
     public EmployeeObrazac(Employee employee) {
         this.employee = employee;
@@ -33,33 +31,33 @@ public class EmployeeObrazac {
         refreshButton = new JButton("Refresh");
         logoutButton = new JButton("Logout");
 
-        String[] columns = {"ID", "Category", "Approved", "Reason", "Start Date", "End Date"}; // Added Start Date and End Date columns
+        String[] columns = {"ID", "Category", "Approved", "Reason", "Start Date", "End Date"};
         tableModel = new DefaultTableModel(columns, 0);
         requestTable = new JTable(tableModel);
 
-        // Set table appearance
         JScrollPane scrollPane = new JScrollPane(requestTable);
         employeePanel = new JPanel(new BorderLayout());
 
         JPanel topPanel = new JPanel(new BorderLayout());
-        topPanel.add(nameLabel, BorderLayout.NORTH); // Add nameLabel at the top
+        topPanel.add(nameLabel, BorderLayout.WEST);
 
         JPanel buttonPanel = new JPanel();
-        buttonPanel.add(addRequestButton); // Add buttons for CRUD operations
+        buttonPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+        buttonPanel.add(addRequestButton);
         buttonPanel.add(editButton);
         buttonPanel.add(deleteButton);
-        buttonPanel.add(refreshButton); // Add refresh button
+        buttonPanel.add(refreshButton);
 
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        bottomPanel.add(logoutButton); // Add logoutButton below the table
+        bottomPanel.add(logoutButton);
 
-        employeePanel.add(topPanel, BorderLayout.NORTH); // Add top panel at the top
-        employeePanel.add(buttonPanel, BorderLayout.NORTH); // Add button panel below the nameLabel
-        employeePanel.add(scrollPane, BorderLayout.CENTER); // Add table below the button panel
-        employeePanel.add(bottomPanel, BorderLayout.SOUTH); // Add logout button below the table
+        JPanel centerPanel = new JPanel(new BorderLayout());
+        centerPanel.add(buttonPanel, BorderLayout.NORTH);
+        centerPanel.add(scrollPane, BorderLayout.CENTER);
 
-        // Load initial tickets for the employee
-        loadEmployeeTickets();
+        employeePanel.add(topPanel, BorderLayout.NORTH);
+        employeePanel.add(centerPanel, BorderLayout.CENTER);
+        employeePanel.add(bottomPanel, BorderLayout.SOUTH);
 
         addRequestButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -98,7 +96,7 @@ public class EmployeeObrazac {
                     Date endDate = createDateFromComboBoxes(endDayComboBox, endMonthComboBox, endYearComboBox);
 
                     if (!reason.isEmpty() && startDate != null && endDate != null) {
-                        Ticket newTicket = new Ticket(category, false, reason, startDate, endDate);
+                        Ticket newTicket = new Ticket(category, "Na cekanju", reason, startDate, endDate, employee.getName() + " " + employee.getSurname());
                         employeeService.addTicketToEmployee(employee.getId(), newTicket);
                         loadEmployeeTickets();
                     } else {
@@ -138,12 +136,16 @@ public class EmployeeObrazac {
                 JTextField reasonField = new JTextField(ticketToEdit.getReason(), 20);
 
                 // Date pickers for start and end dates
-                JComboBox<Integer> startDayComboBox = createDayComboBox(ticketToEdit.getStartTicketDate().getDate());
-                JComboBox<Integer> startMonthComboBox = createMonthComboBox(ticketToEdit.getStartTicketDate().getMonth());
-                JComboBox<Integer> startYearComboBox = createYearComboBox(ticketToEdit.getStartTicketDate().getYear() + 1900);
-                JComboBox<Integer> endDayComboBox = createDayComboBox(ticketToEdit.getEndTicketDate().getDate());
-                JComboBox<Integer> endMonthComboBox = createMonthComboBox(ticketToEdit.getEndTicketDate().getMonth());
-                JComboBox<Integer> endYearComboBox = createYearComboBox(ticketToEdit.getEndTicketDate().getYear() + 1900);
+                Calendar startCal = Calendar.getInstance();
+                startCal.setTime(ticketToEdit.getStartTicketDate());
+                JComboBox<Integer> startDayComboBox = createDayComboBox(startCal.get(Calendar.DAY_OF_MONTH));
+                JComboBox<Integer> startMonthComboBox = createMonthComboBox(startCal.get(Calendar.MONTH));
+                JComboBox<Integer> startYearComboBox = createYearComboBox(startCal.get(Calendar.YEAR));
+                Calendar endCal = Calendar.getInstance();
+                endCal.setTime(ticketToEdit.getEndTicketDate());
+                JComboBox<Integer> endDayComboBox = createDayComboBox(endCal.get(Calendar.DAY_OF_MONTH));
+                JComboBox<Integer> endMonthComboBox = createMonthComboBox(endCal.get(Calendar.MONTH));
+                JComboBox<Integer> endYearComboBox = createYearComboBox(endCal.get(Calendar.YEAR));
 
                 JPanel panel = new JPanel();
                 panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
@@ -190,41 +192,71 @@ public class EmployeeObrazac {
                     if (confirm == JOptionPane.YES_OPTION) {
                         String ticketId = (String) tableModel.getValueAt(selectedRow, 0);
 
-                        // Remove the row from the table
                         tableModel.removeRow(selectedRow);
 
-                        // Delete the ticket from MongoDB
                         employeeService.deleteTicket(employee.getId(), ticketId);
 
-                        // Optionally reload tickets to ensure consistency
                         loadEmployeeTickets();
                     }
                 }
             }
         });
 
-        refreshButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                // Reload tickets for the employee
-                loadEmployeeTickets();
-            }
-        });
-
-        logoutButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                JFrame loginFrame = new JFrame("Login");
-                loginFrame.setContentPane(new Login().getLoginPanel());
-                loginFrame.pack();
-                loginFrame.setVisible(true);
-                JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(employeePanel);
-                topFrame.dispose(); // Close current EmployeeObrazac window
-                loginFrame.setVisible(true); // Show login frame again
-            }
-        });
+        loadEmployeeTickets();
     }
 
-    public JPanel getEmployeePanel() {
-        return employeePanel;
+    private JComboBox<Integer> createDayComboBox() {
+        return createDayComboBox(1);
+    }
+
+    private JComboBox<Integer> createDayComboBox(int selectedDay) {
+        Integer[] days = new Integer[31];
+        for (int i = 1; i <= 31; i++) {
+            days[i - 1] = i;
+        }
+        JComboBox<Integer> comboBox = new JComboBox<>(days);
+        comboBox.setSelectedItem(selectedDay);
+        return comboBox;
+    }
+
+    private JComboBox<Integer> createMonthComboBox() {
+        return createMonthComboBox(0);
+    }
+
+    private JComboBox<Integer> createMonthComboBox(int selectedMonth) {
+        Integer[] months = new Integer[12];
+        for (int i = 0; i < 12; i++) {
+            months[i] = i + 1; // Mjeseci od 1 do 12
+        }
+        JComboBox<Integer> comboBox = new JComboBox<>(months);
+        comboBox.setSelectedItem(selectedMonth + 1); // +1 jer je mjesec 0-indeksiran
+        return comboBox;
+    }
+
+    private JComboBox<Integer> createYearComboBox() {
+        return createYearComboBox(Calendar.getInstance().get(Calendar.YEAR));
+    }
+
+    private JComboBox<Integer> createYearComboBox(int selectedYear) {
+        int currentYear = Calendar.getInstance().get(Calendar.YEAR);
+        Integer[] years = new Integer[10];
+        for (int i = 0; i < 10; i++) {
+            years[i] = currentYear - i; // Zadnjih 10 godina
+        }
+        JComboBox<Integer> comboBox = new JComboBox<>(years);
+        comboBox.setSelectedItem(selectedYear);
+        return comboBox;
+    }
+
+    private Date createDateFromComboBoxes(JComboBox<Integer> dayComboBox, JComboBox<Integer> monthComboBox, JComboBox<Integer> yearComboBox) {
+        int day = (Integer) dayComboBox.getSelectedItem();
+        int month = (Integer) monthComboBox.getSelectedItem() - 1; // Mjesec je 0-indeksiran
+        int year = (Integer) yearComboBox.getSelectedItem();
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(year, month, day, 0, 0, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        return calendar.getTime();
     }
 
     private void loadEmployeeTickets() {
@@ -234,7 +266,7 @@ public class EmployeeObrazac {
             tableModel.addRow(new Object[]{
                     ticket.getId(),
                     ticket.getCategory(),
-                    ticket.isApproved(),
+                    ticket.getApproved(),
                     ticket.getReason(),
                     ticket.getStartTicketDate(),
                     ticket.getEndTicketDate()
@@ -242,54 +274,7 @@ public class EmployeeObrazac {
         }
     }
 
-    private JComboBox<Integer> createDayComboBox() {
-        Integer[] days = new Integer[31];
-        for (int i = 1; i <= 31; i++) {
-            days[i - 1] = i;
-        }
-        return new JComboBox<>(days);
-    }
-
-    private JComboBox<Integer> createDayComboBox(int selectedDay) {
-        JComboBox<Integer> comboBox = createDayComboBox();
-        comboBox.setSelectedItem(selectedDay);
-        return comboBox;
-    }
-
-    private JComboBox<Integer> createMonthComboBox() {
-        Integer[] months = new Integer[12];
-        for (int i = 1; i <= 12; i++) {
-            months[i - 1] = i;
-        }
-        return new JComboBox<>(months);
-    }
-
-    private JComboBox<Integer> createMonthComboBox(int selectedMonth) {
-        JComboBox<Integer> comboBox = createMonthComboBox();
-        comboBox.setSelectedItem(selectedMonth + 1); // Month is 0-based
-        return comboBox;
-    }
-
-    private JComboBox<Integer> createYearComboBox() {
-        int currentYear = Calendar.getInstance().get(Calendar.YEAR);
-        Integer[] years = {currentYear, currentYear + 1};
-        return new JComboBox<>(years);
-    }
-
-    private JComboBox<Integer> createYearComboBox(int selectedYear) {
-        JComboBox<Integer> comboBox = createYearComboBox();
-        comboBox.setSelectedItem(selectedYear);
-        return comboBox;
-    }
-
-    private Date createDateFromComboBoxes(JComboBox<Integer> dayComboBox, JComboBox<Integer> monthComboBox, JComboBox<Integer> yearComboBox) {
-        int day = (int) dayComboBox.getSelectedItem();
-        int month = (int) monthComboBox.getSelectedItem() - 1; // Month is 0-based in Calendar
-        int year = (int) yearComboBox.getSelectedItem();
-
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(year, month, day);
-
-        return calendar.getTime();
+    public JPanel getEmployeePanel() {
+        return employeePanel;
     }
 }

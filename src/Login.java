@@ -1,4 +1,3 @@
-// Login.java asd
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -62,10 +61,10 @@ public class Login {
                             showEmployeePanel(employee);
                             break;
                         case "Manager":
-                            showManagerPanel();
+                            showManagerPanel(employee);
                             break;
                         case "Admin":
-                            showAdminPanel();
+                            showAdminPanel(employee);
                             break;
                         default:
                             JOptionPane.showMessageDialog(null, "Invalid role");
@@ -85,21 +84,27 @@ public class Login {
         frame.setLocationRelativeTo(null); // Center the frame
         frame.setVisible(true);
         // Hide login frame
-        SwingUtilities.getWindowAncestor(loginPanel).setVisible(false);
+        SwingUtilities.getWindowAncestor(loginPanel).dispose();
     }
 
-    private void showManagerPanel() {
+    private void showManagerPanel(Employee employee) {
         JFrame frame = new JFrame("Manager Dashboard");
+        frame.setContentPane(new ManagerObrazac(employee).getMainPanel());
         frame.pack();
         frame.setLocationRelativeTo(null); // Center the frame
         frame.setVisible(true);
+        // Hide login frame
+        SwingUtilities.getWindowAncestor(loginPanel).dispose();
     }
 
-    private void showAdminPanel() {
+    private void showAdminPanel(Employee employee) {
         JFrame frame = new JFrame("Admin Dashboard");
+        //frame.setContentPane(new AdminObrazac(employee).getMainPanel()); // Pretpostavljamo da postoji AdminObrazac klasa s getMainPanel metodom
         frame.pack();
         frame.setLocationRelativeTo(null); // Center the frame
         frame.setVisible(true);
+        // Hide login frame
+        SwingUtilities.getWindowAncestor(loginPanel).dispose();
     }
 
     public JPanel getLoginPanel() {

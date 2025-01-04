@@ -4,32 +4,35 @@ import java.util.Date;
 public class Ticket {
     private String id;
     private String category;
-    private boolean approved;
+    private String approved;
     private String reason;
-    private Date startTicketDate; // New attribute
-    private Date endTicketDate; // New attribute
+    private Date startTicketDate; // Novi atribut
+    private Date endTicketDate; // Novi atribut
+    private String employeeName; // Dodajemo employeeName
 
-    // Constructor with reason, start and end dates
-    public Ticket(String category, boolean approved, String reason, Date startTicketDate, Date endTicketDate) {
+    // Konstruktor sa reason, start i end dates i employeeName
+    public Ticket(String category, String approved, String reason, Date startTicketDate, Date endTicketDate, String employeeName) {
         this.id = UUID.randomUUID().toString();
         this.category = category;
-        this.approved = approved;
+        this.approved = (approved == null) ? "Na cekanju" : approved;
         this.reason = reason;
         this.startTicketDate = startTicketDate;
         this.endTicketDate = endTicketDate;
+        this.employeeName = employeeName; // Inicijalizacija employeeName
     }
 
-    // Constructor with ID, reason, start and end dates
-    public Ticket(String id, String category, boolean approved, String reason, Date startTicketDate, Date endTicketDate) {
+    // Konstruktor sa ID, reason, start i end dates i employeeName
+    public Ticket(String id, String category, String approved, String reason, Date startTicketDate, Date endTicketDate, String employeeName) {
         this.id = id;
         this.category = category;
-        this.approved = approved;
+        this.approved = (approved == null) ? "Na cekanju" : approved;
         this.reason = reason;
         this.startTicketDate = startTicketDate;
         this.endTicketDate = endTicketDate;
+        this.employeeName = employeeName; // Inicijalizacija employeeName
     }
 
-    // Getters and setters for all attributes
+    // Getteri i setteri za sve atribute
     public String getId() {
         return id;
     }
@@ -46,11 +49,11 @@ public class Ticket {
         this.category = category;
     }
 
-    public boolean isApproved() {
+    public String getApproved() {
         return approved;
     }
 
-    public void setApproved(boolean approved) {
+    public void setApproved(String approved) {
         this.approved = approved;
     }
 
@@ -78,15 +81,24 @@ public class Ticket {
         this.endTicketDate = endTicketDate;
     }
 
+    public String getEmployeeName() {
+        return employeeName;
+    }
+
+    public void setEmployeeName(String employeeName) {
+        this.employeeName = employeeName;
+    }
+
     @Override
     public String toString() {
         return "Ticket{" +
                 "id='" + id + '\'' +
                 ", category='" + category + '\'' +
-                ", approved=" + approved +
+                ", approved='" + approved + '\'' +
                 ", reason='" + reason + '\'' +
                 ", startTicketDate=" + startTicketDate +
                 ", endTicketDate=" + endTicketDate +
+                ", employeeName='" + employeeName + '\'' +
                 '}';
     }
 }
