@@ -27,7 +27,7 @@ public class AdminObrazac {
         this.admin = admin;
         employeeService = new EmployeeService();
 
-        nameLabel = new JLabel("Welcome " + admin.getName() + " " + admin.getSurname());
+        nameLabel = new JLabel("          Welcome " + admin.getName() + " " + admin.getSurname());
 
         String[] columns = {"ID", "Name", "Surname", "Email", "Role"};
         tableModel = new DefaultTableModel(columns, 0) {

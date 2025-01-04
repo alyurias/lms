@@ -23,7 +23,7 @@ public class EmployeeObrazac {
     public EmployeeObrazac(Employee employee) {
         this.employee = employee;
         this.employeeService = new EmployeeService();
-        nameLabel = new JLabel("Welcome " + employee.getName() + " " + employee.getSurname());
+        nameLabel = new JLabel("          Welcome " + employee.getName() + " " + employee.getSurname());
 
         addRequestButton = new JButton("Add Request");
         editButton = new JButton("Edit");

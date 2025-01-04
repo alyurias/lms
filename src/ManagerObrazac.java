@@ -24,7 +24,7 @@ public class ManagerObrazac {
         this.employeeService = new EmployeeService();
         mainPanel = new JPanel(new BorderLayout());
 
-        nameLabel = new JLabel("Welcome " + manager.getName() + " " + manager.getSurname());
+        nameLabel = new JLabel("          Welcome " + manager.getName() + " " + manager.getSurname());
         searchButton = new JButton("Search");
         refreshButton = new JButton("Refresh");
         logoutButton = new JButton("Logout");

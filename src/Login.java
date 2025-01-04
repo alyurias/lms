@@ -1,25 +1,29 @@
+import com.formdev.flatlaf.FlatLightLaf;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class Login {
-    private JTextField email;
-    private JPasswordField password;
+    private JTextField emailField;
+    private JPasswordField passwordField;
     private JButton submitButton;
     private JPanel loginPanel;
     private EmployeeService employeeService;
 
     public Login() {
+        // Set up FlatLaf look and feel
+        FlatLightLaf.setup();
+
         employeeService = new EmployeeService();
 
-        email = new JTextField(20);
-        password = new JPasswordField(20);
+        emailField = new JTextField(20);
+        passwordField = new JPasswordField(20);
         submitButton = new JButton("Submit");
 
         // Increase font size for components
-        email.setFont(new Font("Arial", Font.PLAIN, 18));
-        password.setFont(new Font("Arial", Font.PLAIN, 18));
+        emailField.setFont(new Font("Arial", Font.PLAIN, 18));
+        passwordField.setFont(new Font("Arial", Font.PLAIN, 18));
         submitButton.setFont(new Font("Arial", Font.BOLD, 18));
 
         // Layout for the login panel
@@ -33,14 +37,14 @@ public class Login {
         loginPanel.add(new JLabel("Email:"), gbc);
 
         gbc.gridx = 1;
-        loginPanel.add(email, gbc);
+        loginPanel.add(emailField, gbc);
 
         gbc.gridx = 0;
         gbc.gridy = 1;
         loginPanel.add(new JLabel("Password:"), gbc);
 
         gbc.gridx = 1;
-        loginPanel.add(password, gbc);
+        loginPanel.add(passwordField, gbc);
 
         gbc.gridx = 1;
         gbc.gridy = 2;
@@ -50,8 +54,8 @@ public class Login {
         submitButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String emailText = email.getText();
-                String passwordText = new String(password.getPassword());
+                String emailText = emailField.getText().trim();
+                String passwordText = new String(passwordField.getPassword()).trim();
 
                 Employee employee = employeeService.authenticate(emailText, passwordText);
                 if (employee != null) {
@@ -67,11 +71,11 @@ public class Login {
                             showAdminPanel(employee);
                             break;
                         default:
-                            JOptionPane.showMessageDialog(null, "Invalid role");
+                            JOptionPane.showMessageDialog(loginPanel, "Invalid role", "Error", JOptionPane.ERROR_MESSAGE);
                             break;
                     }
                 } else {
-                    JOptionPane.showMessageDialog(null, "Invalid email or password");
+                    JOptionPane.showMessageDialog(loginPanel, "Invalid email or password", "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
@@ -99,7 +103,7 @@ public class Login {
 
     private void showAdminPanel(Employee employee) {
         JFrame frame = new JFrame("Admin Dashboard");
-        frame.setContentPane(new AdminObrazac(employee).getMainPanel()); // Pretpostavljamo da postoji AdminObrazac klasa s getMainPanel metodom
+        frame.setContentPane(new AdminObrazac(employee).getMainPanel());
         frame.pack();
         frame.setLocationRelativeTo(null); // Center the frame
         frame.setVisible(true);
