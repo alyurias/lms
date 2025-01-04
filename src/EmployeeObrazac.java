@@ -32,8 +32,14 @@ public class EmployeeObrazac {
         logoutButton = new JButton("Logout");
 
         String[] columns = {"ID", "Category", "Approved", "Reason", "Start Date", "End Date"};
-        tableModel = new DefaultTableModel(columns, 0);
+        tableModel = new DefaultTableModel(columns, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false; // Make table cells non-editable
+            }
+        };
         requestTable = new JTable(tableModel);
+        requestTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         JScrollPane scrollPane = new JScrollPane(requestTable);
         employeePanel = new JPanel(new BorderLayout());
@@ -99,6 +105,7 @@ public class EmployeeObrazac {
                         Ticket newTicket = new Ticket(category, "Na cekanju", reason, startDate, endDate, employee.getName() + " " + employee.getSurname());
                         employeeService.addTicketToEmployee(employee.getId(), newTicket);
                         loadEmployeeTickets();
+                        JOptionPane.showMessageDialog(employeePanel, "Novi zahtjev je uspješno dodan.", "Dodavanje", JOptionPane.INFORMATION_MESSAGE);
                     } else {
                         JOptionPane.showMessageDialog(null, "All fields must be filled.", "Error", JOptionPane.ERROR_MESSAGE);
                     }
@@ -177,6 +184,7 @@ public class EmployeeObrazac {
 
                         employeeService.updateTicket(ticketToEdit);
                         loadEmployeeTickets();
+                        JOptionPane.showMessageDialog(employeePanel, "Zahtjev je uspješno ažuriran.", "Ažuriranje", JOptionPane.INFORMATION_MESSAGE);
                     } else {
                         JOptionPane.showMessageDialog(null, "All fields must be filled.", "Error", JOptionPane.ERROR_MESSAGE);
                     }
@@ -187,7 +195,9 @@ public class EmployeeObrazac {
         deleteButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 int selectedRow = requestTable.getSelectedRow();
-                if (selectedRow != -1) {
+                if (selectedRow == -1) {
+                    JOptionPane.showMessageDialog(null, "Please select a ticket to delete.", "Error", JOptionPane.ERROR_MESSAGE);
+                } else {
                     int confirm = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete this ticket?", "Confirm Delete", JOptionPane.YES_NO_OPTION);
                     if (confirm == JOptionPane.YES_OPTION) {
                         String ticketId = (String) tableModel.getValueAt(selectedRow, 0);
@@ -197,14 +207,40 @@ public class EmployeeObrazac {
                         employeeService.deleteTicket(employee.getId(), ticketId);
 
                         loadEmployeeTickets();
+                        JOptionPane.showMessageDialog(employeePanel, "Zahtjev je uspješno obrisan.", "Brisanje", JOptionPane.INFORMATION_MESSAGE);
                     }
                 }
+            }
+        });
+
+        refreshButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                loadEmployeeTickets();
+                requestTable.clearSelection(); // Deselect selected row
+                JOptionPane.showMessageDialog(employeePanel, "Unosi su uspješno osvježeni.", "Osvježenje", JOptionPane.INFORMATION_MESSAGE);
+            }
+        });
+
+        logoutButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                // Close Employee Dashboard
+                JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(employeePanel);
+                topFrame.dispose();
+
+                // Show Login screen again
+                JFrame frame = new JFrame("Login");
+                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                frame.setContentPane(new Login().getLoginPanel());
+                frame.setSize(500, 300); // Increase the size of the frame
+                frame.setLocationRelativeTo(null); // Center the frame
+                frame.setVisible(true);
             }
         });
 
         loadEmployeeTickets();
     }
 
+    // Helper methods for creating combo boxes and dates
     private JComboBox<Integer> createDayComboBox() {
         return createDayComboBox(1);
     }
@@ -226,10 +262,10 @@ public class EmployeeObrazac {
     private JComboBox<Integer> createMonthComboBox(int selectedMonth) {
         Integer[] months = new Integer[12];
         for (int i = 0; i < 12; i++) {
-            months[i] = i + 1; // Mjeseci od 1 do 12
+            months[i] = i + 1; // Months from 1 to 12
         }
         JComboBox<Integer> comboBox = new JComboBox<>(months);
-        comboBox.setSelectedItem(selectedMonth + 1); // +1 jer je mjesec 0-indeksiran
+        comboBox.setSelectedItem(selectedMonth + 1); // +1 because month is 0-indexed
         return comboBox;
     }
 
@@ -241,7 +277,7 @@ public class EmployeeObrazac {
         int currentYear = Calendar.getInstance().get(Calendar.YEAR);
         Integer[] years = new Integer[10];
         for (int i = 0; i < 10; i++) {
-            years[i] = currentYear - i; // Zadnjih 10 godina
+            years[i] = currentYear - i; // Last 10 years
         }
         JComboBox<Integer> comboBox = new JComboBox<>(years);
         comboBox.setSelectedItem(selectedYear);
@@ -250,7 +286,7 @@ public class EmployeeObrazac {
 
     private Date createDateFromComboBoxes(JComboBox<Integer> dayComboBox, JComboBox<Integer> monthComboBox, JComboBox<Integer> yearComboBox) {
         int day = (Integer) dayComboBox.getSelectedItem();
-        int month = (Integer) monthComboBox.getSelectedItem() - 1; // Mjesec je 0-indeksiran
+        int month = (Integer) monthComboBox.getSelectedItem() - 1; // Month is 0-indexed
         int year = (Integer) yearComboBox.getSelectedItem();
 
         Calendar calendar = Calendar.getInstance();

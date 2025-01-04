@@ -3,6 +3,8 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.List;
 
 public class ManagerObrazac {
@@ -11,6 +13,7 @@ public class ManagerObrazac {
     private JTable ticketsTable;
     private JLabel nameLabel;
     private JButton searchButton;
+    private JButton refreshButton;
     private Employee manager;
     private EmployeeService employeeService;
 
@@ -23,17 +26,27 @@ public class ManagerObrazac {
 
         nameLabel = new JLabel("Welcome " + manager.getName() + " " + manager.getSurname());
         searchButton = new JButton("Search");
+        refreshButton = new JButton("Refresh");
         logoutButton = new JButton("Logout");
 
-        String[] columns = {"Ticket ID", "Employee Name", "Start Date", "Approved"};
-        tableModel = new DefaultTableModel(columns, 0);
+        String[] columns = {"Ticket ID", "Employee Name", "Start Date", "Category", "Approved"};
+        tableModel = new DefaultTableModel(columns, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false; // Make table cells non-editable
+            }
+        };
         ticketsTable = new JTable(tableModel);
+        ticketsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         JScrollPane scrollPane = new JScrollPane(ticketsTable);
 
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.add(nameLabel, BorderLayout.WEST);
-        topPanel.add(searchButton, BorderLayout.SOUTH);
+        JPanel topRightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        topRightPanel.add(searchButton);
+        topRightPanel.add(refreshButton);
+        topPanel.add(topRightPanel, BorderLayout.EAST);
 
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         bottomPanel.add(logoutButton);
@@ -46,6 +59,14 @@ public class ManagerObrazac {
             @Override
             public void actionPerformed(ActionEvent e) {
                 showSearchDialog();
+            }
+        });
+
+        refreshButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                loadTickets();
+                JOptionPane.showMessageDialog(mainPanel, "Unosi su uspješno osvježeni.", "Osvježenje", JOptionPane.INFORMATION_MESSAGE);
             }
         });
 
@@ -63,6 +84,19 @@ public class ManagerObrazac {
                 frame.setSize(500, 300); // Increase the size of the frame
                 frame.setLocationRelativeTo(null); // Center the frame
                 frame.setVisible(true);
+            }
+        });
+
+        ticketsTable.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2) {
+                    int selectedRow = ticketsTable.getSelectedRow();
+                    if (selectedRow != -1) {
+                        String ticketId = (String) tableModel.getValueAt(selectedRow, 0);
+                        showTicketDetails(ticketId);
+                        ticketsTable.setSelectionBackground(Color.LIGHT_GRAY); // Change background color of the selected row
+                    }
+                }
             }
         });
 
@@ -97,6 +131,7 @@ public class ManagerObrazac {
             boolean zdravstveniSelected = zdravstveniCheckBox.isSelected();
 
             searchTickets(firstName, lastName, obicniSelected, redovniSelected, zdravstveniSelected);
+            JOptionPane.showMessageDialog(mainPanel, "Pretraga je uspješno obavljena.", "Pretraga", JOptionPane.INFORMATION_MESSAGE);
         }
     }
 
@@ -108,6 +143,7 @@ public class ManagerObrazac {
                     ticket.getId(),
                     ticket.getEmployeeName(),
                     ticket.getStartTicketDate(),
+                    ticket.getCategory(), // Adding the Category column
                     ticket.getApproved()
             });
         }
@@ -121,8 +157,47 @@ public class ManagerObrazac {
                     ticket.getId(),
                     ticket.getEmployeeName(),
                     ticket.getStartTicketDate(),
+                    ticket.getCategory(), // Adding the Category column
                     ticket.getApproved()
             });
+        }
+    }
+
+    private void showTicketDetails(String ticketId) {
+        Ticket ticket = employeeService.getTicketById(ticketId);
+        Employee employee = employeeService.getEmployeeByTicketId(ticketId);
+
+        if (ticket != null && employee != null) {
+            JTextArea textArea = new JTextArea(15, 30);
+            textArea.setText(
+                    "Ticket ID: " + ticket.getId() + "\n" +
+                            "Category: " + ticket.getCategory() + "\n" +
+                            "Approved: " + ticket.getApproved() + "\n" +
+                            "Reason: " + ticket.getReason() + "\n" +
+                            "Start Date: " + ticket.getStartTicketDate() + "\n" +
+                            "End Date: " + ticket.getEndTicketDate() + "\n\n" +
+                            "Employee Name: " + employee.getName() + " " + employee.getSurname() + "\n" +
+                            "Employee Email: " + employee.getEmail() + "\n" +
+                            "Employee Role: " + employee.getRole()
+            );
+            textArea.setEditable(false);
+
+            String[] statusOptions = {"Na cekanju", "Odobreno", "Odbijeno"};
+            JComboBox<String> statusComboBox = new JComboBox<>(statusOptions);
+            statusComboBox.setSelectedItem(ticket.getApproved());
+
+            JPanel panel = new JPanel(new BorderLayout());
+            panel.add(new JScrollPane(textArea), BorderLayout.CENTER);
+            panel.add(statusComboBox, BorderLayout.SOUTH);
+
+            int option = JOptionPane.showConfirmDialog(null, panel, "Ticket Details", JOptionPane.OK_CANCEL_OPTION);
+            if (option == JOptionPane.OK_OPTION) {
+                String updatedStatus = (String) statusComboBox.getSelectedItem();
+                ticket.setApproved(updatedStatus);
+                employeeService.updateTicket(ticket);
+                loadTickets();
+                JOptionPane.showMessageDialog(mainPanel, "Status tiketa je uspješno ažuriran.", "Ažuriranje", JOptionPane.INFORMATION_MESSAGE);
+            }
         }
     }
 

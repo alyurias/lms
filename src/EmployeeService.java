@@ -193,4 +193,38 @@ public class EmployeeService {
         }
         return null;
     }
+
+    // Metoda za dohvatanje tiketa po ID-u
+    public Ticket getTicketById(String ticketId) {
+        Document ticketDoc = ticketCollection.find(Filters.eq("id", ticketId)).first();
+        if (ticketDoc != null) {
+            String id = ticketDoc.getString("id");
+            String category = ticketDoc.getString("category");
+            String approved = ticketDoc.getString("approved");
+            String reason = ticketDoc.getString("reason");
+            Date startTicketDate = getDateFromDocument(ticketDoc, "startTicketDate");
+            Date endTicketDate = getDateFromDocument(ticketDoc, "endTicketDate");
+
+            String employeeName = "Unknown"; // Placeholder, to be updated
+
+            return new Ticket(id, category, approved, reason, startTicketDate, endTicketDate, employeeName);
+        }
+        return null;
+    }
+
+    // Metoda za dohvatanje zaposlenika po tiketu ID
+    public Employee getEmployeeByTicketId(String ticketId) {
+        Document employeeDoc = employeeCollection.find(Filters.eq("tickets", ticketId)).first();
+        if (employeeDoc != null) {
+            String id = employeeDoc.getString("_id");
+            String name = employeeDoc.getString("name");
+            String surname = employeeDoc.getString("surname");
+            String email = employeeDoc.getString("email");
+            String role = employeeDoc.getString("role");
+            List<String> tickets = (List<String>) employeeDoc.get("tickets");
+
+            return new Employee(id, name, surname, email, "", new ArrayList<>(tickets), role);
+        }
+        return null;
+    }
 }
