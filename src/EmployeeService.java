@@ -37,7 +37,7 @@ public class EmployeeService {
                 String role = doc.getString("role");
                 List<String> tickets = (List<String>) doc.get("tickets");
 
-                return new Employee(id, name, surname, email, storedPassword, new ArrayList<>(tickets), role);
+                return new Employee(id, name, surname, email, storedPassword, role, tickets);
             } else {
                 System.out.println("Passwords do not match.");
             }
@@ -223,8 +223,111 @@ public class EmployeeService {
             String role = employeeDoc.getString("role");
             List<String> tickets = (List<String>) employeeDoc.get("tickets");
 
-            return new Employee(id, name, surname, email, "", new ArrayList<>(tickets), role);
+            return new Employee(id, name, surname, email, "", role, tickets);
         }
         return null;
+    }
+
+    // Metoda za dodavanje zaposlenika
+    public void addEmployee(Employee employee) {
+        Document employeeDoc = new Document("_id", employee.getId())
+                .append("name", employee.getName())
+                .append("surname", employee.getSurname())
+                .append("email", employee.getEmail())
+                .append("password", employee.getPassword())
+                .append("role", employee.getRole())
+                .append("tickets", new ArrayList<String>()); // Prazna lista tiketa
+
+        employeeCollection.insertOne(employeeDoc);
+    }
+
+    // Metoda za dohvatanje svih zaposlenika
+    public List<Employee> getAllEmployees() {
+        List<Employee> employees = new ArrayList<>();
+        for (Document employeeDoc : employeeCollection.find()) {
+            employees.add(createEmployeeFromDocument(employeeDoc));
+        }
+        return employees;
+    }
+
+    // Metoda za dohvatanje zaposlenika po ID-u
+    public Employee getEmployeeById(String employeeId) {
+        Document employeeDoc = employeeCollection.find(Filters.eq("_id", employeeId)).first();
+        if (employeeDoc != null) {
+            return createEmployeeFromDocument(employeeDoc);
+        }
+        return null;
+    }
+
+    // Metoda za pretraživanje zaposlenika
+    public List<Employee> searchEmployees(String name, String surname, String email) {
+        List<Bson> filters = new ArrayList<>();
+        if (!name.isEmpty()) {
+            filters.add(Filters.regex("name", name, "i")); // Case-insensitive pretraga
+        }
+        if (!surname.isEmpty()) {
+            filters.add(Filters.regex("surname", surname, "i")); // Case-insensitive pretraga
+        }
+        if (!email.isEmpty()) {
+            filters.add(Filters.regex("email", email, "i")); // Case-insensitive pretraga
+        }
+
+        Bson combinedFilters = filters.isEmpty() ? new Document() : Filters.and(filters);
+
+        List<Employee> employees = new ArrayList<>();
+        for (Document employeeDoc : employeeCollection.find(combinedFilters)) {
+            employees.add(createEmployeeFromDocument(employeeDoc));
+        }
+        return employees;
+    }
+
+    // Metoda za ažuriranje zaposlenika
+    public void updateEmployee(Employee employee) {
+        Document query = new Document("_id", employee.getId());
+        Document update = new Document("$set", new Document("name", employee.getName())
+                .append("surname", employee.getSurname())
+                .append("email", employee.getEmail())
+                .append("role", employee.getRole())
+                .append("tickets", employee.getTickets()));
+
+        employeeCollection.updateOne(query, update);
+    }
+
+    // Metoda za brisanje zaposlenika
+    public void deleteEmployee(String employeeId) {
+        Document query = new Document("_id", employeeId);
+        employeeCollection.deleteOne(query);
+    }
+
+    // Metoda za kreiranje Employee objekta iz dokumenta
+    private Employee createEmployeeFromDocument(Document doc) {
+        String id = doc.getString("_id");
+        String name = doc.getString("name");
+        String surname = doc.getString("surname");
+        String email = doc.getString("email");
+        String password = doc.getString("password");
+        String role = doc.getString("role");
+        List<String> tickets = (List<String>) doc.get("tickets");
+
+        return new Employee(id, name, surname, email, password, role, tickets);
+    }
+
+    public void clearAllTicketsForEmployee(String employeeId) {
+        // Dohvatiti zaposlenika po ID-u
+        Employee employee = getEmployeeById(employeeId);
+        if (employee != null) {
+            // Dohvatiti listu ticketa zaposlenika
+            List<String> tickets = employee.getTickets();
+            if (!tickets.isEmpty()) {
+                // Brisanje ticketa iz kolekcije "tickets" u bazi podataka
+                for (String ticketId : tickets) {
+                    ticketCollection.deleteOne(Filters.eq("_id", ticketId));
+                }
+                // Brisanje ticketa iz liste zaposlenika
+                employee.setTickets(new ArrayList<>());
+                // Ažurirati zaposlenika u kolekciji "employees" u bazi podataka
+                updateEmployee(employee);
+            }
+        }
     }
 }

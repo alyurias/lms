@@ -99,7 +99,7 @@ public class Login {
 
     private void showAdminPanel(Employee employee) {
         JFrame frame = new JFrame("Admin Dashboard");
-        //frame.setContentPane(new AdminObrazac(employee).getMainPanel()); // Pretpostavljamo da postoji AdminObrazac klasa s getMainPanel metodom
+        frame.setContentPane(new AdminObrazac(employee).getMainPanel()); // Pretpostavljamo da postoji AdminObrazac klasa s getMainPanel metodom
         frame.pack();
         frame.setLocationRelativeTo(null); // Center the frame
         frame.setVisible(true);
