@@ -196,7 +196,7 @@ public class EmployeeObrazac {
             public void actionPerformed(ActionEvent e) {
                 int selectedRow = requestTable.getSelectedRow();
                 if (selectedRow == -1) {
-                    JOptionPane.showMessageDialog(null, "Molim Vas odaberite datum", "Greška", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "Molimm Vas odaberite datum", "Greška", JOptionPane.ERROR_MESSAGE);
                 } else {
                     int confirm = JOptionPane.showConfirmDialog(null, "Da li ste sigurni?", "Potvrdi", JOptionPane.YES_NO_OPTION);
                     if (confirm == JOptionPane.YES_OPTION) {
