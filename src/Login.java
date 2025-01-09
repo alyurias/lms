@@ -61,10 +61,10 @@ public class Login {
                 if (employee != null) {
                     String role = employee.getRole();
                     switch (role) {
-                        case "Zaposlenik":
+                        case "Employee":
                             showEmployeePanel(employee);
                             break;
-                        case "Menadžer":
+                        case "Manager":
                             showManagerPanel(employee);
                             break;
                         case "Admin":
