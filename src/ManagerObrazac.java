@@ -1,5 +1,6 @@
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -33,11 +34,12 @@ public class ManagerObrazac {
         tableModel = new DefaultTableModel(columns, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                return false; // Make table cells non-editable
+                return false;
             }
         };
         ticketsTable = new JTable(tableModel);
         ticketsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        ticketsTable.setDefaultRenderer(Object.class, new StatusCellRenderer());
 
         JScrollPane scrollPane = new JScrollPane(ticketsTable);
 
@@ -73,16 +75,13 @@ public class ManagerObrazac {
         logoutButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Close Manager Dashboard
                 JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(mainPanel);
                 topFrame.dispose();
-
-                // Show Login screen again
                 JFrame frame = new JFrame("Prijava");
                 frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                 frame.setContentPane(new Login().getLoginPanel());
-                frame.setSize(500, 300); // Increase the size of the frame
-                frame.setLocationRelativeTo(null); // Center the frame
+                frame.setSize(500, 300);
+                frame.setLocationRelativeTo(null);
                 frame.setVisible(true);
             }
         });
@@ -94,7 +93,7 @@ public class ManagerObrazac {
                     if (selectedRow != -1) {
                         String ticketId = (String) tableModel.getValueAt(selectedRow, 0);
                         showTicketDetails(ticketId);
-                        ticketsTable.setSelectionBackground(Color.LIGHT_GRAY); // Change background color of the selected row
+                        ticketsTable.setSelectionBackground(Color.LIGHT_GRAY);
                     }
                 }
             }
@@ -137,13 +136,13 @@ public class ManagerObrazac {
 
     private void loadTickets() {
         List<Ticket> tickets = employeeService.getAllTickets();
-        tableModel.setRowCount(0); // Clear existing rows
+        tableModel.setRowCount(0);
         for (Ticket ticket : tickets) {
             tableModel.addRow(new Object[]{
                     ticket.getId(),
                     ticket.getEmployeeName(),
                     ticket.getStartTicketDate(),
-                    ticket.getCategory(), // Adding the Category column
+                    ticket.getCategory(),
                     ticket.getApproved()
             });
         }
@@ -151,13 +150,13 @@ public class ManagerObrazac {
 
     private void searchTickets(String firstName, String lastName, boolean obicni, boolean redovni, boolean zdravstveni) {
         List<Ticket> filteredTickets = employeeService.searchTickets(firstName, lastName, obicni, redovni, zdravstveni);
-        tableModel.setRowCount(0); // Clear existing rows
+        tableModel.setRowCount(0);
         for (Ticket ticket : filteredTickets) {
             tableModel.addRow(new Object[]{
                     ticket.getId(),
                     ticket.getEmployeeName(),
                     ticket.getStartTicketDate(),
-                    ticket.getCategory(), // Adding the Category column
+                    ticket.getCategory(),
                     ticket.getApproved()
             });
         }
@@ -203,5 +202,41 @@ public class ManagerObrazac {
 
     public JPanel getMainPanel() {
         return mainPanel;
+    }
+
+    private class StatusCellRenderer extends JLabel implements TableCellRenderer {
+        public StatusCellRenderer() {
+            setOpaque(true);
+        }
+
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            setText(value.toString());
+
+            if (isSelected) {
+                setBackground(table.getSelectionBackground());
+                setForeground(table.getSelectionForeground());
+            } else {
+                setBackground(table.getBackground());
+                setForeground(table.getForeground());
+            }
+
+            if (value != null) {
+                switch (value.toString()) {
+                    case "Na čekanju":
+                        setForeground(new Color(255, 203, 31));
+                        break;
+                    case "Odobreno":
+                        setForeground(new Color(144, 238, 144));
+                        break;
+                    case "Odbijeno":
+                        setForeground(new Color(255, 102, 102));
+                        break;
+                }
+            }
+
+
+            return this;
+        }
     }
 }

@@ -6,9 +6,9 @@ public class Ticket {
     private String category;
     private String approved;
     private String reason;
-    private Date startTicketDate; // Novi atribut
-    private Date endTicketDate; // Novi atribut
-    private String employeeName; // Dodajemo employeeName
+    private Date startTicketDate;
+    private Date endTicketDate;
+    private String employeeName;
 
     // Konstruktor sa reason, start i end dates i employeeName
     public Ticket(String category, String approved, String reason, Date startTicketDate, Date endTicketDate, String employeeName) {

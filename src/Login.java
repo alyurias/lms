@@ -15,8 +15,8 @@ public class Login {
         // Set up FlatLaf look and feel
         FlatLightLaf.setup();
 
+        // Initialize components
         employeeService = new EmployeeService();
-
         emailField = new JTextField(20);
         passwordField = new JPasswordField(20);
         submitButton = new JButton("Potvrdi");
@@ -26,8 +26,17 @@ public class Login {
         passwordField.setFont(new Font("Arial", Font.PLAIN, 18));
         submitButton.setFont(new Font("Arial", Font.BOLD, 18));
 
-        // Layout for the login panel
-        loginPanel = new JPanel();
+        // Set up background image
+        loginPanel = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                ImageIcon backgroundIcon = new ImageIcon("C:\\Users\\lejla\\IdeaProjects\\lms\\src\\pozadina2.gif");
+                Image backgroundImage = backgroundIcon.getImage();
+                g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
+            }
+        };
+
         loginPanel.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
 
@@ -51,6 +60,7 @@ public class Login {
         gbc.anchor = GridBagConstraints.CENTER;
         loginPanel.add(submitButton, gbc);
 
+        // Set up action listener for the button
         submitButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -79,10 +89,20 @@ public class Login {
                 }
             }
         });
+
+        // Create JFrame and set the application icon
+        JFrame frame = new JFrame("Prijava");
+        IconUtils.setAppIcon(frame);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setContentPane(loginPanel);
+        frame.setSize(500, 300); // Increase the size of the frame
+        frame.setLocationRelativeTo(null); // Center the frame
+        frame.setVisible(true);
     }
 
     private void showEmployeePanel(Employee employee) {
         JFrame frame = new JFrame("Zaposlenik");
+        IconUtils.setAppIcon(frame);
         frame.setContentPane(new EmployeeObrazac(employee).getEmployeePanel());
         frame.pack();
         frame.setLocationRelativeTo(null); // Center the frame
@@ -93,6 +113,7 @@ public class Login {
 
     private void showManagerPanel(Employee employee) {
         JFrame frame = new JFrame("Menadžer");
+        IconUtils.setAppIcon(frame);
         frame.setContentPane(new ManagerObrazac(employee).getMainPanel());
         frame.pack();
         frame.setLocationRelativeTo(null); // Center the frame
@@ -103,6 +124,7 @@ public class Login {
 
     private void showAdminPanel(Employee employee) {
         JFrame frame = new JFrame("Admin");
+        IconUtils.setAppIcon(frame);
         frame.setContentPane(new AdminObrazac(employee).getMainPanel());
         frame.pack();
         frame.setLocationRelativeTo(null); // Center the frame
@@ -115,17 +137,14 @@ public class Login {
         return loginPanel;
     }
 
+    public static class IconUtils {
+        public static void setAppIcon(JFrame frame) {
+            ImageIcon icon = new ImageIcon("C:\\Users\\lejla\\IdeaProjects\\lms\\src\\korisnik.jpg");
+            frame.setIconImage(icon.getImage());
+        }
+    }
+
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                JFrame frame = new JFrame("Prijava");
-                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                frame.setContentPane(new Login().getLoginPanel());
-                frame.setSize(500, 300); // Increase the size of the frame
-                frame.setLocationRelativeTo(null); // Center the frame
-                frame.setVisible(true);
-            }
-        });
+        SwingUtilities.invokeLater(Login::new);
     }
 }

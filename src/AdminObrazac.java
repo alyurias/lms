@@ -285,7 +285,7 @@ public class AdminObrazac {
             editPanel.add(surnameField);
             editPanel.add(new JLabel("Email:"));
             editPanel.add(emailField);
-            editPanel.add(new JLabel("Lozinka: (leave blank to keep current)"));
+            editPanel.add(new JLabel("Lozinka: (ostavi prazno ako želiš zadržati trenutnu)"));
             editPanel.add(passwordField);
             editPanel.add(new JLabel("Uloga:"));
             editPanel.add(employeeRadio);
