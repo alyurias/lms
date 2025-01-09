@@ -15,16 +15,24 @@ public class Login {
         // Set up FlatLaf look and feel
         FlatLightLaf.setup();
 
+        // Set default font
+        UIManager.put("Label.font", new Font("Segoe UI", Font.PLAIN, 18));
+        UIManager.put("Button.font", new Font("Segoe UI", Font.BOLD, 18));
+        UIManager.put("TextField.font", new Font("Segoe UI", Font.PLAIN, 18));
+        UIManager.put("PasswordField.font", new Font("Segoe UI", Font.PLAIN, 18));
+        UIManager.put("OptionPane.messageFont", new Font("Segoe UI", Font.PLAIN, 18));
+        UIManager.put("OptionPane.buttonFont", new Font("Segoe UI", Font.PLAIN, 18));
+
         // Initialize components
         employeeService = new EmployeeService();
         emailField = new JTextField(20);
         passwordField = new JPasswordField(20);
         submitButton = new JButton("Potvrdi");
 
-        // Increase font size for components
-        emailField.setFont(new Font("Arial", Font.PLAIN, 18));
-        passwordField.setFont(new Font("Arial", Font.PLAIN, 18));
-        submitButton.setFont(new Font("Arial", Font.BOLD, 18));
+        // Set text color for components
+        emailField.setForeground(Color.BLACK);
+        passwordField.setForeground(Color.BLACK);
+        submitButton.setForeground(Color.BLACK);
 
         // Set up background image
         loginPanel = new JPanel() {
@@ -40,23 +48,31 @@ public class Login {
         loginPanel.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
 
+        // Add Dobrodošli label
         gbc.gridx = 0;
         gbc.gridy = 0;
+        gbc.gridwidth = 2;
         gbc.insets = new Insets(10, 10, 10, 10);
-        loginPanel.add(new JLabel("Email:"), gbc);
+        JLabel welcomeLabel = new JLabel("<html><span style='font-size:20px; font-weight:bold; color:white;'>Dobrodošli!</span></html>");
+        loginPanel.add(welcomeLabel, gbc);
+
+        gbc.gridwidth = 1;
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        loginPanel.add(new JLabel("<html><span style='font-weight:bold; color:white;'>Email:</span></html>"), gbc);
 
         gbc.gridx = 1;
         loginPanel.add(emailField, gbc);
 
         gbc.gridx = 0;
-        gbc.gridy = 1;
-        loginPanel.add(new JLabel("Lozinka:"), gbc);
+        gbc.gridy = 2;
+        loginPanel.add(new JLabel("<html><span style='font-weight:bold; color:white;'>Lozinka:</span></html>"), gbc);
 
         gbc.gridx = 1;
         loginPanel.add(passwordField, gbc);
 
         gbc.gridx = 1;
-        gbc.gridy = 2;
+        gbc.gridy = 3;
         gbc.anchor = GridBagConstraints.CENTER;
         loginPanel.add(submitButton, gbc);
 
@@ -139,7 +155,7 @@ public class Login {
 
     public static class IconUtils {
         public static void setAppIcon(JFrame frame) {
-            ImageIcon icon = new ImageIcon("C:\\Users\\lejla\\IdeaProjects\\lms\\src\\korisnik.jpg");
+            ImageIcon icon = new ImageIcon("C:\\Users\\lejla\\IdeaProjects\\lms\\src\\korisnik2.png");
             frame.setIconImage(icon.getImage());
         }
     }
