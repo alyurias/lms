@@ -27,9 +27,10 @@ public class AdminObrazac {
         this.admin = admin;
         employeeService = new EmployeeService();
 
-        nameLabel = new JLabel("          Welcome " + admin.getName() + " " + admin.getSurname());
+        nameLabel = new JLabel("          Dobrodošli, " + admin.getName() + " " + admin.getSurname());
 
-        String[] columns = {"ID", "Name", "Surname", "Email", "Role"};
+        String[] columns = {"ID", "Ime", "Prezime", "Email", "Uloga" +
+                ""};
         tableModel = new DefaultTableModel(columns, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -44,14 +45,14 @@ public class AdminObrazac {
         mainPanel = new JPanel(new BorderLayout());
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        buttonPanel.add(addButton = new JButton("Add"));
-        buttonPanel.add(editButton = new JButton("Edit"));
-        buttonPanel.add(deleteButton = new JButton("Delete"));
-        buttonPanel.add(searchButton = new JButton("Search"));
-        buttonPanel.add(refreshButton = new JButton("Refresh"));
+        buttonPanel.add(addButton = new JButton("Dodaj"));
+        buttonPanel.add(editButton = new JButton("Uredi"));
+        buttonPanel.add(deleteButton = new JButton("Obriši"));
+        buttonPanel.add(searchButton = new JButton("Pretraži"));
+        buttonPanel.add(refreshButton = new JButton("Osvježi"));
 
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        bottomPanel.add(logoutButton = new JButton("Logout"));
+        bottomPanel.add(logoutButton = new JButton("Odjava"));
 
         mainPanel.add(nameLabel, BorderLayout.NORTH);
         mainPanel.add(buttonPanel, BorderLayout.BEFORE_FIRST_LINE);
@@ -86,7 +87,7 @@ public class AdminObrazac {
             public void actionPerformed(ActionEvent e) {
                 int selectedRow = table1.getSelectedRow();
                 if (selectedRow == -1) {
-                    JOptionPane.showMessageDialog(null, "Please select an employee to edit.", "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "Molim Vas odaberite radnika za uređivanje", "Greška", JOptionPane.ERROR_MESSAGE);
                 } else {
                     String employeeId = (String) tableModel.getValueAt(selectedRow, 0);
                     showEditDialog(employeeId);
@@ -99,9 +100,9 @@ public class AdminObrazac {
             public void actionPerformed(ActionEvent e) {
                 int selectedRow = table1.getSelectedRow();
                 if (selectedRow == -1) {
-                    JOptionPane.showMessageDialog(null, "Please select an employee to delete.", "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "Molim Vas odaberite zaposlenika", "Greška", JOptionPane.ERROR_MESSAGE);
                 } else {
-                    int confirm = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete this employee?", "Confirm Delete", JOptionPane.YES_NO_OPTION);
+                    int confirm = JOptionPane.showConfirmDialog(null, "Da li sigurno želite obrisati ovog zaposlenika?", "Potvrdi brisanje", JOptionPane.YES_NO_OPTION);
                     if (confirm == JOptionPane.YES_OPTION) {
                         String employeeId = (String) tableModel.getValueAt(selectedRow, 0);
                         employeeService.deleteEmployee(employeeId);
@@ -132,7 +133,7 @@ public class AdminObrazac {
                 topFrame.dispose();
 
                 // Show Login screen again
-                JFrame frame = new JFrame("Login");
+                JFrame frame = new JFrame("Prijava");
                 frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                 frame.setContentPane(new Login().getLoginPanel());
                 frame.setSize(500, 300); // Increase the size of the frame
@@ -151,14 +152,14 @@ public class AdminObrazac {
 
         JPanel searchPanel = new JPanel();
         searchPanel.setLayout(new BoxLayout(searchPanel, BoxLayout.Y_AXIS));
-        searchPanel.add(new JLabel("Name:"));
+        searchPanel.add(new JLabel("Ime:"));
         searchPanel.add(nameField);
-        searchPanel.add(new JLabel("Surname:"));
+        searchPanel.add(new JLabel("Prezime:"));
         searchPanel.add(surnameField);
         searchPanel.add(new JLabel("Email:"));
         searchPanel.add(emailField);
 
-        int option = JOptionPane.showConfirmDialog(null, searchPanel, "Search Employees", JOptionPane.OK_CANCEL_OPTION);
+        int option = JOptionPane.showConfirmDialog(null, searchPanel, "Pretraži zapslenike", JOptionPane.OK_CANCEL_OPTION);
         if (option == JOptionPane.OK_OPTION) {
             String name = nameField.getText().trim();
             String surname = surnameField.getText().trim();
@@ -188,8 +189,8 @@ public class AdminObrazac {
         JTextField surnameField = new JTextField(20);
         JTextField emailField = new JTextField(20);
         JPasswordField passwordField = new JPasswordField(20);
-        JRadioButton employeeRadio = new JRadioButton("Employee");
-        JRadioButton managerRadio = new JRadioButton("Manager");
+        JRadioButton employeeRadio = new JRadioButton("Zaposlenik");
+        JRadioButton managerRadio = new JRadioButton("Menadžer");
         JRadioButton adminRadio = new JRadioButton("Admin");
         ButtonGroup roleGroup = new ButtonGroup();
         roleGroup.add(employeeRadio);
@@ -198,21 +199,21 @@ public class AdminObrazac {
 
         JPanel addPanel = new JPanel();
         addPanel.setLayout(new BoxLayout(addPanel, BoxLayout.Y_AXIS));
-        addPanel.add(new JLabel("Name:"));
+        addPanel.add(new JLabel("Ime:"));
         addPanel.add(nameField);
-        addPanel.add(new JLabel("Surname:"));
+        addPanel.add(new JLabel("Prezime:"));
         addPanel.add(surnameField);
         addPanel.add(new JLabel("Email:"));
         addPanel.add(emailField);
-        addPanel.add(new JLabel("Password:"));
+        addPanel.add(new JLabel("Lozinka:"));
         addPanel.add(passwordField);
-        addPanel.add(new JLabel("Role:"));
+        addPanel.add(new JLabel("Uloga:"));
         addPanel.add(employeeRadio);
         addPanel.add(managerRadio);
         addPanel.add(adminRadio);
 
         while (true) {
-            int option = JOptionPane.showConfirmDialog(null, addPanel, "Add Employee", JOptionPane.OK_CANCEL_OPTION);
+            int option = JOptionPane.showConfirmDialog(null, addPanel, "Dodaj zaposlenika", JOptionPane.OK_CANCEL_OPTION);
             if (option == JOptionPane.CANCEL_OPTION || option == JOptionPane.CLOSED_OPTION) {
                 break;
             }
@@ -221,25 +222,25 @@ public class AdminObrazac {
             String surname = formatName(surnameField.getText().trim());
             String email = emailField.getText().trim();
             String password = new String(passwordField.getPassword()).trim();
-            String role = employeeRadio.isSelected() ? "Employee" : managerRadio.isSelected() ? "Manager" : "Admin";
+            String role = employeeRadio.isSelected() ? "Zaposlenik" : managerRadio.isSelected() ? "Menadžer" : "Admin";
 
             if (!isValidName(name)) {
-                JOptionPane.showMessageDialog(null, "Invalid name format.", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Neispravan format imena.", "Greška", JOptionPane.ERROR_MESSAGE);
                 nameField.requestFocus();
                 continue;
             }
             if (!isValidName(surname)) {
-                JOptionPane.showMessageDialog(null, "Invalid surname format.", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Neispravan format prezimena.", "Greška", JOptionPane.ERROR_MESSAGE);
                 surnameField.requestFocus();
                 continue;
             }
             if (!isValidEmail(email)) {
-                JOptionPane.showMessageDialog(null, "Invalid email format.", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Neispravan format email-a.", "Greška", JOptionPane.ERROR_MESSAGE);
                 emailField.requestFocus();
                 continue;
             }
             if (!isValidPassword(password)) {
-                JOptionPane.showMessageDialog(null, "Invalid password format.", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Neispravan format lozinke.", "Greška", JOptionPane.ERROR_MESSAGE);
                 passwordField.requestFocus();
                 continue;
             }
@@ -260,17 +261,17 @@ public class AdminObrazac {
             JTextField surnameField = new JTextField(employee.getSurname(), 20);
             JTextField emailField = new JTextField(employee.getEmail(), 20);
             JPasswordField passwordField = new JPasswordField(20);
-            JRadioButton employeeRadio = new JRadioButton("Employee");
-            JRadioButton managerRadio = new JRadioButton("Manager");
+            JRadioButton employeeRadio = new JRadioButton("Zaposlenik");
+            JRadioButton managerRadio = new JRadioButton("Menadžer");
             JRadioButton adminRadio = new JRadioButton("Admin");
             ButtonGroup roleGroup = new ButtonGroup();
             roleGroup.add(employeeRadio);
             roleGroup.add(managerRadio);
             roleGroup.add(adminRadio);
 
-            if (employee.getRole().equals("Employee")) {
+            if (employee.getRole().equals("Zaposlenik")) {
                 employeeRadio.setSelected(true);
-            } else if (employee.getRole().equals("Manager")) {
+            } else if (employee.getRole().equals("Menadžer")) {
                 managerRadio.setSelected(true);
             } else {
                 adminRadio.setSelected(true);
@@ -278,39 +279,39 @@ public class AdminObrazac {
 
             JPanel editPanel = new JPanel();
             editPanel.setLayout(new BoxLayout(editPanel, BoxLayout.Y_AXIS));
-            editPanel.add(new JLabel("Name:"));
+            editPanel.add(new JLabel("Ime:"));
             editPanel.add(nameField);
-            editPanel.add(new JLabel("Surname:"));
+            editPanel.add(new JLabel("Prezime:"));
             editPanel.add(surnameField);
             editPanel.add(new JLabel("Email:"));
             editPanel.add(emailField);
-            editPanel.add(new JLabel("Password: (leave blank to keep current)"));
+            editPanel.add(new JLabel("Lozinka: (leave blank to keep current)"));
             editPanel.add(passwordField);
-            editPanel.add(new JLabel("Role:"));
+            editPanel.add(new JLabel("Uloga:"));
             editPanel.add(employeeRadio);
             editPanel.add(managerRadio);
             editPanel.add(adminRadio);
 
-            int option = JOptionPane.showConfirmDialog(null, editPanel, "Edit Employee", JOptionPane.OK_CANCEL_OPTION);
+            int option = JOptionPane.showConfirmDialog(null, editPanel, "Uredi zaposlenika", JOptionPane.OK_CANCEL_OPTION);
             if (option == JOptionPane.OK_OPTION) {
                 String updatedName = formatName(nameField.getText().trim());
                 String updatedSurname = formatName(surnameField.getText().trim());
                 String updatedEmail = emailField.getText().trim();
                 String updatedPassword = new String(passwordField.getPassword()).trim();
-                String updatedRole = employeeRadio.isSelected() ? "Employee" : managerRadio.isSelected() ? "Manager" : "Admin";
+                String updatedRole = employeeRadio.isSelected() ? "Zaposlenik" : managerRadio.isSelected() ? "Menadžer" : "Admin";
 
                 if (!isValidName(updatedName)) {
-                    JOptionPane.showMessageDialog(null, "Invalid name format.", "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "Neispravan format imena.", "Greška", JOptionPane.ERROR_MESSAGE);
                     nameField.requestFocus();
                     return;
                 }
                 if (!isValidName(updatedSurname)) {
-                    JOptionPane.showMessageDialog(null, "Invalid surname format.", "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "Neispravan format prezimena.", "Greška", JOptionPane.ERROR_MESSAGE);
                     surnameField.requestFocus();
                     return;
                 }
                 if (!isValidEmail(updatedEmail)) {
-                    JOptionPane.showMessageDialog(null, "Invalid email format.", "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "Neispravan format email-a.", "Greška", JOptionPane.ERROR_MESSAGE);
                     emailField.requestFocus();
                     return;
                 }
@@ -324,7 +325,7 @@ public class AdminObrazac {
                     if (isValidPassword(updatedPassword)) {
                         employee.setPassword(updatedPassword);
                     } else {
-                        JOptionPane.showMessageDialog(null, "Invalid password format.", "Error", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(null, "Neispravan format lozinke", "Greška", JOptionPane.ERROR_MESSAGE);
                         passwordField.requestFocus();
                         return;
                     }
@@ -342,7 +343,7 @@ public class AdminObrazac {
         if (employee != null) {
             List<String> tickets = employee.getTickets();
             if (tickets.isEmpty()) {
-                JOptionPane.showMessageDialog(mainPanel, "This employee has no tickets.", "Tickets", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(mainPanel, "Ovaj zaposlenik nema tikete.", "Tiketi", JOptionPane.INFORMATION_MESSAGE);
                 return;
             }
 
@@ -354,22 +355,22 @@ public class AdminObrazac {
                 if (ticket != null) {
                     JPanel ticketInfoPanel = new JPanel(new GridLayout(1, 3));
                     ticketInfoPanel.add(new JLabel("ID: " + ticket.getId()));
-                    ticketInfoPanel.add(new JLabel("Category: " + ticket.getCategory()));
-                    ticketInfoPanel.add(new JLabel("Reason: " + ticket.getReason()));
+                    ticketInfoPanel.add(new JLabel("Kategorija: " + ticket.getCategory()));
+                    ticketInfoPanel.add(new JLabel("Razlog: " + ticket.getReason()));
                     ticketPanel.add(ticketInfoPanel);
                 }
             }
 
-            JButton clearButton = new JButton("Clear All Tickets");
+            JButton clearButton = new JButton("Izbrisi sve tikete");
             clearButton.setAlignmentX(Component.CENTER_ALIGNMENT);
             clearButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    int confirm = JOptionPane.showConfirmDialog(null, "Are you sure you want to clear all tickets for this employee?", "Confirm Clear", JOptionPane.YES_NO_OPTION);
+                    int confirm = JOptionPane.showConfirmDialog(null, "Da li sigurno zelis obrisati sve tikete?", "Potvrdi brisanje", JOptionPane.YES_NO_OPTION);
                     if (confirm == JOptionPane.YES_OPTION) {
                         employeeService.clearAllTicketsForEmployee(employeeId);
                         loadEmployees();
-                        JOptionPane.showMessageDialog(mainPanel, "All tickets cleared for this employee.", "Clear Tickets", JOptionPane.INFORMATION_MESSAGE);
+                        JOptionPane.showMessageDialog(mainPanel, "Svi tiekti su obrisani", "Obriši tikete", JOptionPane.INFORMATION_MESSAGE);
                     }
                 }
             });
@@ -377,7 +378,7 @@ public class AdminObrazac {
             ticketPanel.add(Box.createRigidArea(new Dimension(0, 10))); // Add space before the button
             ticketPanel.add(clearButton);
 
-            JOptionPane.showMessageDialog(mainPanel, ticketPanel, "Employee Tickets", JOptionPane.PLAIN_MESSAGE);
+            JOptionPane.showMessageDialog(mainPanel, ticketPanel, "Tiketi zaposlenika", JOptionPane.PLAIN_MESSAGE);
         }
     }
 

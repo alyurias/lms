@@ -24,12 +24,12 @@ public class ManagerObrazac {
         this.employeeService = new EmployeeService();
         mainPanel = new JPanel(new BorderLayout());
 
-        nameLabel = new JLabel("          Welcome " + manager.getName() + " " + manager.getSurname());
-        searchButton = new JButton("Search");
-        refreshButton = new JButton("Refresh");
-        logoutButton = new JButton("Logout");
+        nameLabel = new JLabel("          Dobrodošli, " + manager.getName() + " " + manager.getSurname());
+        searchButton = new JButton("Pretraži");
+        refreshButton = new JButton("Osvježi");
+        logoutButton = new JButton("Odjava");
 
-        String[] columns = {"Ticket ID", "Employee Name", "Start Date", "Category", "Approved"};
+        String[] columns = {"Ticket ID", "Ime zaposlenika", "Početni datum", "Kategorija", "Status"};
         tableModel = new DefaultTableModel(columns, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -78,7 +78,7 @@ public class ManagerObrazac {
                 topFrame.dispose();
 
                 // Show Login screen again
-                JFrame frame = new JFrame("Login");
+                JFrame frame = new JFrame("Prijava");
                 frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                 frame.setContentPane(new Login().getLoginPanel());
                 frame.setSize(500, 300); // Increase the size of the frame
@@ -107,22 +107,22 @@ public class ManagerObrazac {
         JTextField firstNameField = new JTextField(20);
         JTextField lastNameField = new JTextField(20);
 
-        JCheckBox obicniCheckBox = new JCheckBox("Obicni");
+        JCheckBox obicniCheckBox = new JCheckBox("Obični");
         JCheckBox redovniCheckBox = new JCheckBox("Redovni");
         JCheckBox zdravstveniCheckBox = new JCheckBox("Zdravstveni");
 
         JPanel searchPanel = new JPanel();
         searchPanel.setLayout(new BoxLayout(searchPanel, BoxLayout.Y_AXIS));
-        searchPanel.add(new JLabel("First Name:"));
+        searchPanel.add(new JLabel("Ime:"));
         searchPanel.add(firstNameField);
-        searchPanel.add(new JLabel("Last Name:"));
+        searchPanel.add(new JLabel("Prezime:"));
         searchPanel.add(lastNameField);
-        searchPanel.add(new JLabel("Category:"));
+        searchPanel.add(new JLabel("Kategorija:"));
         searchPanel.add(obicniCheckBox);
         searchPanel.add(redovniCheckBox);
         searchPanel.add(zdravstveniCheckBox);
 
-        int option = JOptionPane.showConfirmDialog(null, searchPanel, "Search Tickets", JOptionPane.OK_CANCEL_OPTION);
+        int option = JOptionPane.showConfirmDialog(null, searchPanel, "Pretraži tikete", JOptionPane.OK_CANCEL_OPTION);
         if (option == JOptionPane.OK_OPTION) {
             String firstName = firstNameField.getText().trim();
             String lastName = lastNameField.getText().trim();
@@ -171,18 +171,18 @@ public class ManagerObrazac {
             JTextArea textArea = new JTextArea(15, 30);
             textArea.setText(
                     "Ticket ID: " + ticket.getId() + "\n" +
-                            "Category: " + ticket.getCategory() + "\n" +
-                            "Approved: " + ticket.getApproved() + "\n" +
-                            "Reason: " + ticket.getReason() + "\n" +
-                            "Start Date: " + ticket.getStartTicketDate() + "\n" +
-                            "End Date: " + ticket.getEndTicketDate() + "\n\n" +
-                            "Employee Name: " + employee.getName() + " " + employee.getSurname() + "\n" +
-                            "Employee Email: " + employee.getEmail() + "\n" +
-                            "Employee Role: " + employee.getRole()
+                            "Kategorija: " + ticket.getCategory() + "\n" +
+                            "Status: " + ticket.getApproved() + "\n" +
+                            "Razlog: " + ticket.getReason() + "\n" +
+                            "Početni datum: " + ticket.getStartTicketDate() + "\n" +
+                            "Završni datum: " + ticket.getEndTicketDate() + "\n\n" +
+                            "Ime zaposlenika: " + employee.getName() + " " + employee.getSurname() + "\n" +
+                            "Email zaposlenika: " + employee.getEmail() + "\n" +
+                            "Uloga zaposlenika: " + employee.getRole()
             );
             textArea.setEditable(false);
 
-            String[] statusOptions = {"Na cekanju", "Odobreno", "Odbijeno"};
+            String[] statusOptions = {"Na čekanju", "Odobreno", "Odbijeno"};
             JComboBox<String> statusComboBox = new JComboBox<>(statusOptions);
             statusComboBox.setSelectedItem(ticket.getApproved());
 
@@ -190,7 +190,7 @@ public class ManagerObrazac {
             panel.add(new JScrollPane(textArea), BorderLayout.CENTER);
             panel.add(statusComboBox, BorderLayout.SOUTH);
 
-            int option = JOptionPane.showConfirmDialog(null, panel, "Ticket Details", JOptionPane.OK_CANCEL_OPTION);
+            int option = JOptionPane.showConfirmDialog(null, panel, "Detalji o tiketu", JOptionPane.OK_CANCEL_OPTION);
             if (option == JOptionPane.OK_OPTION) {
                 String updatedStatus = (String) statusComboBox.getSelectedItem();
                 ticket.setApproved(updatedStatus);

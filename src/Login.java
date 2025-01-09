@@ -19,7 +19,7 @@ public class Login {
 
         emailField = new JTextField(20);
         passwordField = new JPasswordField(20);
-        submitButton = new JButton("Submit");
+        submitButton = new JButton("Potvrdi");
 
         // Increase font size for components
         emailField.setFont(new Font("Arial", Font.PLAIN, 18));
@@ -41,7 +41,7 @@ public class Login {
 
         gbc.gridx = 0;
         gbc.gridy = 1;
-        loginPanel.add(new JLabel("Password:"), gbc);
+        loginPanel.add(new JLabel("Lozinka:"), gbc);
 
         gbc.gridx = 1;
         loginPanel.add(passwordField, gbc);
@@ -61,28 +61,28 @@ public class Login {
                 if (employee != null) {
                     String role = employee.getRole();
                     switch (role) {
-                        case "Employee":
+                        case "Zaposlenik":
                             showEmployeePanel(employee);
                             break;
-                        case "Manager":
+                        case "Menadžer":
                             showManagerPanel(employee);
                             break;
                         case "Admin":
                             showAdminPanel(employee);
                             break;
                         default:
-                            JOptionPane.showMessageDialog(loginPanel, "Invalid role", "Error", JOptionPane.ERROR_MESSAGE);
+                            JOptionPane.showMessageDialog(loginPanel, "Neispravna uloga", "Greška", JOptionPane.ERROR_MESSAGE);
                             break;
                     }
                 } else {
-                    JOptionPane.showMessageDialog(loginPanel, "Invalid email or password", "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(loginPanel, "Nije tačna lozinka ili email", "Greška", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
     }
 
     private void showEmployeePanel(Employee employee) {
-        JFrame frame = new JFrame("Employee Dashboard");
+        JFrame frame = new JFrame("Zaposlenik");
         frame.setContentPane(new EmployeeObrazac(employee).getEmployeePanel());
         frame.pack();
         frame.setLocationRelativeTo(null); // Center the frame
@@ -92,7 +92,7 @@ public class Login {
     }
 
     private void showManagerPanel(Employee employee) {
-        JFrame frame = new JFrame("Manager Dashboard");
+        JFrame frame = new JFrame("Menadžer");
         frame.setContentPane(new ManagerObrazac(employee).getMainPanel());
         frame.pack();
         frame.setLocationRelativeTo(null); // Center the frame
@@ -102,7 +102,7 @@ public class Login {
     }
 
     private void showAdminPanel(Employee employee) {
-        JFrame frame = new JFrame("Admin Dashboard");
+        JFrame frame = new JFrame("Admin");
         frame.setContentPane(new AdminObrazac(employee).getMainPanel());
         frame.pack();
         frame.setLocationRelativeTo(null); // Center the frame
@@ -119,7 +119,7 @@ public class Login {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                JFrame frame = new JFrame("Login");
+                JFrame frame = new JFrame("Prijava");
                 frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                 frame.setContentPane(new Login().getLoginPanel());
                 frame.setSize(500, 300); // Increase the size of the frame

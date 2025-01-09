@@ -14,7 +14,7 @@ public class Ticket {
     public Ticket(String category, String approved, String reason, Date startTicketDate, Date endTicketDate, String employeeName) {
         this.id = UUID.randomUUID().toString();
         this.category = category;
-        this.approved = (approved == null) ? "Na cekanju" : approved;
+        this.approved = (approved == null) ? "Na čekanju" : approved;
         this.reason = reason;
         this.startTicketDate = startTicketDate;
         this.endTicketDate = endTicketDate;
@@ -25,7 +25,7 @@ public class Ticket {
     public Ticket(String id, String category, String approved, String reason, Date startTicketDate, Date endTicketDate, String employeeName) {
         this.id = id;
         this.category = category;
-        this.approved = (approved == null) ? "Na cekanju" : approved;
+        this.approved = (approved == null) ? "Na čekanju" : approved;
         this.reason = reason;
         this.startTicketDate = startTicketDate;
         this.endTicketDate = endTicketDate;
@@ -93,12 +93,12 @@ public class Ticket {
     public String toString() {
         return "Ticket{" +
                 "id='" + id + '\'' +
-                ", category='" + category + '\'' +
-                ", approved='" + approved + '\'' +
-                ", reason='" + reason + '\'' +
-                ", startTicketDate=" + startTicketDate +
-                ", endTicketDate=" + endTicketDate +
-                ", employeeName='" + employeeName + '\'' +
+                ", Kategorija='" + category + '\'' +
+                ", Status='" + approved + '\'' +
+                ", Razlog='" + reason + '\'' +
+                ", Početni datum=" + startTicketDate +
+                ", Završni datum=" + endTicketDate +
+                ", Ime='" + employeeName + '\'' +
                 '}';
     }
 }

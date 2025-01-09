@@ -23,15 +23,15 @@ public class EmployeeObrazac {
     public EmployeeObrazac(Employee employee) {
         this.employee = employee;
         this.employeeService = new EmployeeService();
-        nameLabel = new JLabel("          Welcome " + employee.getName() + " " + employee.getSurname());
+        nameLabel = new JLabel("          Dobrodošli, " + employee.getName() + " " + employee.getSurname());
 
-        addRequestButton = new JButton("Add Request");
-        editButton = new JButton("Edit");
-        deleteButton = new JButton("Delete");
-        refreshButton = new JButton("Refresh");
-        logoutButton = new JButton("Logout");
+        addRequestButton = new JButton("Dodaj zahtjev");
+        editButton = new JButton("Uredi");
+        deleteButton = new JButton("Izbriši");
+        refreshButton = new JButton("Osvježi");
+        logoutButton = new JButton("Odjava");
 
-        String[] columns = {"ID", "Category", "Approved", "Reason", "Start Date", "End Date"};
+        String[] columns = {"ID", "Kategorija", "Status", "Razlog", "Početni datum", "Završni datum"};
         tableModel = new DefaultTableModel(columns, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -67,7 +67,7 @@ public class EmployeeObrazac {
 
         addRequestButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                String[] categories = {"Obicni", "Redovni", "Zdravstveni"};
+                String[] categories = {"Obični", "Redovni", "Zdravstveni"};
                 JComboBox<String> categoryComboBox = new JComboBox<>(categories);
                 JTextField reasonField = new JTextField(20);
 
@@ -81,20 +81,20 @@ public class EmployeeObrazac {
 
                 JPanel panel = new JPanel();
                 panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-                panel.add(new JLabel("Category:"));
+                panel.add(new JLabel("Kategorija:"));
                 panel.add(categoryComboBox);
-                panel.add(new JLabel("Reason:"));
+                panel.add(new JLabel("Razlog:"));
                 panel.add(reasonField);
-                panel.add(new JLabel("Start Date:"));
+                panel.add(new JLabel("Početni datum:"));
                 panel.add(startDayComboBox);
                 panel.add(startMonthComboBox);
                 panel.add(startYearComboBox);
-                panel.add(new JLabel("End Date:"));
+                panel.add(new JLabel("Završni datum:"));
                 panel.add(endDayComboBox);
                 panel.add(endMonthComboBox);
                 panel.add(endYearComboBox);
 
-                int option = JOptionPane.showConfirmDialog(null, panel, "Add Ticket", JOptionPane.OK_CANCEL_OPTION);
+                int option = JOptionPane.showConfirmDialog(null, panel, "Dodaj tiket", JOptionPane.OK_CANCEL_OPTION);
                 if (option == JOptionPane.OK_OPTION) {
                     String category = (String) categoryComboBox.getSelectedItem();
                     String reason = reasonField.getText().trim();
@@ -102,12 +102,12 @@ public class EmployeeObrazac {
                     Date endDate = createDateFromComboBoxes(endDayComboBox, endMonthComboBox, endYearComboBox);
 
                     if (!reason.isEmpty() && startDate != null && endDate != null) {
-                        Ticket newTicket = new Ticket(category, "Na cekanju", reason, startDate, endDate, employee.getName() + " " + employee.getSurname());
+                        Ticket newTicket = new Ticket(category, "Na čekanju", reason, startDate, endDate, employee.getName() + " " + employee.getSurname());
                         employeeService.addTicketToEmployee(employee.getId(), newTicket);
                         loadEmployeeTickets();
                         JOptionPane.showMessageDialog(employeePanel, "Novi zahtjev je uspješno dodan.", "Dodavanje", JOptionPane.INFORMATION_MESSAGE);
                     } else {
-                        JOptionPane.showMessageDialog(null, "All fields must be filled.", "Error", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(null, "Sve mora biti popunjeno.", "Greška", JOptionPane.ERROR_MESSAGE);
                     }
                 }
             }
@@ -117,7 +117,7 @@ public class EmployeeObrazac {
             public void actionPerformed(ActionEvent e) {
                 int selectedRow = requestTable.getSelectedRow();
                 if (selectedRow == -1) {
-                    JOptionPane.showMessageDialog(null, "Please select a ticket to edit.", "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "Molim Vas odaberite tiket za uređivanje.", "Greška", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
 
@@ -132,11 +132,11 @@ public class EmployeeObrazac {
                 }
 
                 if (ticketToEdit == null) {
-                    JOptionPane.showMessageDialog(null, "Ticket not found.", "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "Tiket nije pronađen.", "Greška", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
 
-                String[] categories = {"Obicni", "Redovni", "Zdravstveni"};
+                String[] categories = {"Obični", "Redovni", "Zdravstveni"};
                 JComboBox<String> categoryComboBox = new JComboBox<>(categories);
                 categoryComboBox.setSelectedItem(ticketToEdit.getCategory());
 
@@ -156,20 +156,20 @@ public class EmployeeObrazac {
 
                 JPanel panel = new JPanel();
                 panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-                panel.add(new JLabel("Category:"));
+                panel.add(new JLabel("Kategorija:"));
                 panel.add(categoryComboBox);
-                panel.add(new JLabel("Reason:"));
+                panel.add(new JLabel("Razlog:"));
                 panel.add(reasonField);
-                panel.add(new JLabel("Start Date:"));
+                panel.add(new JLabel("Početni datum:"));
                 panel.add(startDayComboBox);
                 panel.add(startMonthComboBox);
                 panel.add(startYearComboBox);
-                panel.add(new JLabel("End Date:"));
+                panel.add(new JLabel("Završni datum:"));
                 panel.add(endDayComboBox);
                 panel.add(endMonthComboBox);
                 panel.add(endYearComboBox);
 
-                int option = JOptionPane.showConfirmDialog(null, panel, "Edit Ticket", JOptionPane.OK_CANCEL_OPTION);
+                int option = JOptionPane.showConfirmDialog(null, panel, "Uredi tiket", JOptionPane.OK_CANCEL_OPTION);
                 if (option == JOptionPane.OK_OPTION) {
                     String updatedCategory = (String) categoryComboBox.getSelectedItem();
                     String updatedReason = reasonField.getText().trim();
@@ -186,7 +186,7 @@ public class EmployeeObrazac {
                         loadEmployeeTickets();
                         JOptionPane.showMessageDialog(employeePanel, "Zahtjev je uspješno ažuriran.", "Ažuriranje", JOptionPane.INFORMATION_MESSAGE);
                     } else {
-                        JOptionPane.showMessageDialog(null, "All fields must be filled.", "Error", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(null, "Sve mora biti popunjeno", "Greška", JOptionPane.ERROR_MESSAGE);
                     }
                 }
             }
@@ -196,9 +196,9 @@ public class EmployeeObrazac {
             public void actionPerformed(ActionEvent e) {
                 int selectedRow = requestTable.getSelectedRow();
                 if (selectedRow == -1) {
-                    JOptionPane.showMessageDialog(null, "Please select a ticket to delete.", "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "Molim Vas odaberite datum", "Greška", JOptionPane.ERROR_MESSAGE);
                 } else {
-                    int confirm = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete this ticket?", "Confirm Delete", JOptionPane.YES_NO_OPTION);
+                    int confirm = JOptionPane.showConfirmDialog(null, "Da li ste sigurni?", "Potvrdi", JOptionPane.YES_NO_OPTION);
                     if (confirm == JOptionPane.YES_OPTION) {
                         String ticketId = (String) tableModel.getValueAt(selectedRow, 0);
 
@@ -228,7 +228,7 @@ public class EmployeeObrazac {
                 topFrame.dispose();
 
                 // Show Login screen again
-                JFrame frame = new JFrame("Login");
+                JFrame frame = new JFrame("Prijava");
                 frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                 frame.setContentPane(new Login().getLoginPanel());
                 frame.setSize(500, 300); // Increase the size of the frame
