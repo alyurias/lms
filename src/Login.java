@@ -1,3 +1,4 @@
+import com.formdev.flatlaf.FlatDarculaLaf;
 import com.formdev.flatlaf.FlatLightLaf;
 import javax.swing.*;
 import java.awt.*;
@@ -13,7 +14,7 @@ public class Login {
 
     public Login() {
         // Set up FlatLaf look and feel
-        FlatLightLaf.setup();
+        FlatDarculaLaf.setup();
 
         // Set default font
         UIManager.put("Label.font", new Font("Segoe UI", Font.PLAIN, 18));
@@ -30,9 +31,9 @@ public class Login {
         submitButton = new JButton("Potvrdi");
 
         // Set text color for components
-        emailField.setForeground(Color.BLACK);
-        passwordField.setForeground(Color.BLACK);
-        submitButton.setForeground(Color.BLACK);
+        emailField.setForeground(Color.WHITE);
+        passwordField.setForeground(Color.WHITE);
+        submitButton.setForeground(Color.WHITE);
 
         // Set up background image
         loginPanel = new JPanel() {
