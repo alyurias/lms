@@ -1,12 +1,12 @@
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableCellRenderer;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import javax.swing.table.TableCellRenderer;
 
 public class EmployeeObrazac {
     private Employee employee;
@@ -41,9 +41,6 @@ public class EmployeeObrazac {
         };
         requestTable = new JTable(tableModel);
         requestTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-
-        // Set custom renderer for the "Status" column
-        requestTable.getColumnModel().getColumn(2).setCellRenderer(new StatusCellRenderer());
 
         JScrollPane scrollPane = new JScrollPane(requestTable);
         employeePanel = new JPanel(new BorderLayout());
@@ -117,33 +114,135 @@ public class EmployeeObrazac {
             }
         });
 
-        // Other buttons' action listeners are similar, no need to modify those
+        editButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                int selectedRow = requestTable.getSelectedRow();
+                if (selectedRow == -1) {
+                    JOptionPane.showMessageDialog(null, "Molim Vas odaberite tiket za uređivanje.", "Greška", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                String ticketId = (String) tableModel.getValueAt(selectedRow, 0);
+                Ticket ticketToEdit = null;
+                List<Ticket> tickets = employeeService.getTicketsForEmployee(employee.getId());
+                for (Ticket ticket : tickets) {
+                    if (ticket.getId().equals(ticketId)) {
+                        ticketToEdit = ticket;
+                        break;
+                    }
+                }
+
+                if (ticketToEdit == null) {
+                    JOptionPane.showMessageDialog(null, "Tiket nije pronađen.", "Greška", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                String[] categories = {"Obični", "Redovni", "Zdravstveni"};
+                JComboBox<String> categoryComboBox = new JComboBox<>(categories);
+                categoryComboBox.setSelectedItem(ticketToEdit.getCategory());
+
+                JTextField reasonField = new JTextField(ticketToEdit.getReason(), 20);
+
+                // Date pickers for start and end dates
+                Calendar startCal = Calendar.getInstance();
+                startCal.setTime(ticketToEdit.getStartTicketDate());
+                JComboBox<Integer> startDayComboBox = createDayComboBox(startCal.get(Calendar.DAY_OF_MONTH));
+                JComboBox<Integer> startMonthComboBox = createMonthComboBox(startCal.get(Calendar.MONTH));
+                JComboBox<Integer> startYearComboBox = createYearComboBox(startCal.get(Calendar.YEAR));
+                Calendar endCal = Calendar.getInstance();
+                endCal.setTime(ticketToEdit.getEndTicketDate());
+                JComboBox<Integer> endDayComboBox = createDayComboBox(endCal.get(Calendar.DAY_OF_MONTH));
+                JComboBox<Integer> endMonthComboBox = createMonthComboBox(endCal.get(Calendar.MONTH));
+                JComboBox<Integer> endYearComboBox = createYearComboBox(endCal.get(Calendar.YEAR));
+
+                JPanel panel = new JPanel();
+                panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+                panel.add(new JLabel("Kategorija:"));
+                panel.add(categoryComboBox);
+                panel.add(new JLabel("Razlog:"));
+                panel.add(reasonField);
+                panel.add(new JLabel("Početni datum:"));
+                panel.add(startDayComboBox);
+                panel.add(startMonthComboBox);
+                panel.add(startYearComboBox);
+                panel.add(new JLabel("Završni datum:"));
+                panel.add(endDayComboBox);
+                panel.add(endMonthComboBox);
+                panel.add(endYearComboBox);
+
+                int option = JOptionPane.showConfirmDialog(null, panel, "Uredi tiket", JOptionPane.OK_CANCEL_OPTION);
+                if (option == JOptionPane.OK_OPTION) {
+                    String updatedCategory = (String) categoryComboBox.getSelectedItem();
+                    String updatedReason = reasonField.getText().trim();
+                    Date updatedStartDate = createDateFromComboBoxes(startDayComboBox, startMonthComboBox, startYearComboBox);
+                    Date updatedEndDate = createDateFromComboBoxes(endDayComboBox, endMonthComboBox, endYearComboBox);
+
+                    if (!updatedReason.isEmpty() && updatedStartDate != null && updatedEndDate != null) {
+                        ticketToEdit.setCategory(updatedCategory);
+                        ticketToEdit.setReason(updatedReason);
+                        ticketToEdit.setStartTicketDate(updatedStartDate);
+                        ticketToEdit.setEndTicketDate(updatedEndDate);
+
+                        employeeService.updateTicket(ticketToEdit);
+                        loadEmployeeTickets();
+                        JOptionPane.showMessageDialog(employeePanel, "Zahtjev je uspješno ažuriran.", "Ažuriranje", JOptionPane.INFORMATION_MESSAGE);
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Sve mora biti popunjeno", "Greška", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+            }
+        });
+
+        deleteButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                int selectedRow = requestTable.getSelectedRow();
+                if (selectedRow == -1) {
+                    JOptionPane.showMessageDialog(null, "Molim Vas odaberite datum", "Greška", JOptionPane.ERROR_MESSAGE);
+                } else {
+                    int confirm = JOptionPane.showConfirmDialog(null, "Da li ste sigurni?", "Potvrdi", JOptionPane.YES_NO_OPTION);
+                    if (confirm == JOptionPane.YES_OPTION) {
+                        String ticketId = (String) tableModel.getValueAt(selectedRow, 0);
+
+                        tableModel.removeRow(selectedRow);
+
+                        employeeService.deleteTicket(employee.getId(), ticketId);
+
+                        loadEmployeeTickets();
+                        JOptionPane.showMessageDialog(employeePanel, "Zahtjev je uspješno obrisan.", "Brisanje", JOptionPane.INFORMATION_MESSAGE);
+                    }
+                }
+            }
+        });
+
+        refreshButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                loadEmployeeTickets();
+                requestTable.clearSelection(); // Deselect selected row
+                JOptionPane.showMessageDialog(employeePanel, "Unosi su uspješno osvježeni.", "Osvježenje", JOptionPane.INFORMATION_MESSAGE);
+            }
+        });
+
+        logoutButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                // Close Employee Dashboard
+                JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(employeePanel);
+                topFrame.dispose();
+
+                // Show Login screen again
+                JFrame frame = new JFrame("Prijava");
+                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                frame.setContentPane(new Login().getLoginPanel());
+                frame.setSize(500, 300); // Increase the size of the frame
+                frame.setLocationRelativeTo(null); // Center the frame
+                frame.setVisible(true);
+            }
+
+        });
 
         loadEmployeeTickets();
     }
 
-    // Custom renderer for the "Status" column to change background color based on the status
-    class StatusCellRenderer extends JLabel implements TableCellRenderer {
-        @Override
-        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-            setText(value.toString());
-            if (value != null) {
-                String status = value.toString();
-                if (status.equals("Na čekanju")) {
-                    setBackground(new Color(255, 255, 2)); // Pastel Yellow
-                } else if (status.equals("Odobreno")) {
-                    setBackground(new Color(115, 255, 0)); // Pastel Green
-                } else if (status.equals("Odbijeno")) {
-                    setBackground(new Color(255, 47, 0)); // Pastel Red
-                } else {
-                    setBackground(Color.WHITE); // Default color
-                }
 
-            }
-            setOpaque(true); // Ensure the background color is visible
-            return this;
-        }
-    }
 
     // Helper methods for creating combo boxes and dates
     private JComboBox<Integer> createDayComboBox() {
